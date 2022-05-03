@@ -37,7 +37,7 @@ let package = Package(
         .target(name: "Networking", dependencies: []),
         .testTarget(name: "NetworkingTests", dependencies: ["Networking"]),
         .target(name: "Persistence", dependencies: [
-            .byName(name: "KeychainAccess")
+            .byName(name: "KeychainAccess", condition: .when(platforms: [.macOS]))
         ]),
     ]
 )

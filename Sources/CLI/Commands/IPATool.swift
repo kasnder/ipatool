@@ -13,7 +13,7 @@ struct IPATool: AsyncParsableCommand {
         return CommandConfiguration(
             commandName: "ipatool",
             abstract: "A cli tool for interacting with Apple's ipa files.",
-            version: Package.version,
+            //version: Package.version,
             subcommands: [Auth.self, Download.self, Purchase.self, Search.self]
         )
     }

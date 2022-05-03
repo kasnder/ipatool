@@ -100,6 +100,8 @@ extension StoreRequest {
     // and stripping the nonalphabetic characters from the string.
     // https://stackoverflow.com/a/31838376
     private var guid: String {
+
+#if os(macOS)
         let MAC_ADDRESS_LENGTH = 6
         let bsds: [String] = ["en0", "en1"]
         var bsd: String = bsds[0]
@@ -138,5 +140,9 @@ extension StoreRequest {
         let macAddressData = infoData[lower..<upper]
         let addressBytes = macAddressData.map{ String(format:"%02x", $0) }
         return addressBytes.joined().uppercased()
+
+#else
+        return "80E650281F24"
+#endif
     }
 }

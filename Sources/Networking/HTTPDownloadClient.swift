@@ -6,6 +6,9 @@
 //
 
 import Foundation
+#if canImport(FoundationNetworking)
+import FoundationNetworking
+#endif
 
 public protocol HTTPDownloadClientInterface {
     func download(from source: URL, to target: URL, progress: @escaping (Float) -> Void) async throws

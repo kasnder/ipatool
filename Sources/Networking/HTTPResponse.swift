@@ -18,6 +18,8 @@ extension HTTPResponse {
             throw Error.noData
         }
         
+        print(String(data: data, encoding: .utf8)!)
+        
         switch decoder {
         case .json:
             let decoder = JSONDecoder()
