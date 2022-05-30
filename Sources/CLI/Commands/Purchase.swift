@@ -14,7 +14,7 @@ import Networking
 import StoreAPI
 import Persistence
 
-struct Purchase: AsyncParsableCommand {
+struct Purchase: ParsableCommand {
     static var configuration: CommandConfiguration {
         return .init(abstract: "Obtain a license for the app from the App Store.")
     }
@@ -38,7 +38,7 @@ struct Purchase: AsyncParsableCommand {
 }
 
 extension Purchase {
-    private mutating func app(with bundleIdentifier: String) async -> iTunesResponse.Result {
+    private mutating func app(with bundleIdentifier: String) -> iTunesResponse.Result {
         logger.log("Creating HTTP client...", level: .debug)
         let httpClient = HTTPClient(session: URLSession.shared)
 
@@ -47,7 +47,7 @@ extension Purchase {
 
         do {
             logger.log("Querying the iTunes Store for '\(bundleIdentifier)' in country '\(countryCode)'...", level: .info)
-            let app = try await itunesClient.lookup(
+            let app = try itunesClient.lookup(
                 bundleIdentifier: bundleIdentifier,
                 countryCode: countryCode,
                 deviceFamily: deviceFamily
@@ -73,7 +73,7 @@ extension Purchase {
         }
     }
 
-    private mutating func purchase(app: iTunesResponse.Result, account: Account) async {
+    private mutating func purchase(app: iTunesResponse.Result, account: Account) {
         logger.log("Creating HTTP client...", level: .debug)
         let httpClient = HTTPClient(session: URLSession.shared)
 
@@ -82,7 +82,7 @@ extension Purchase {
 
         do {
             logger.log("Obtaining a license for '\(app.identifier)' from the App Store...", level: .info)
-            try await storeClient.purchase(
+            try storeClient.purchase(
                 identifier: "\(app.identifier)",
                 directoryServicesIdentifier: account.directoryServicesIdentifier,
                 passwordToken: account.passwordToken,
@@ -110,7 +110,7 @@ extension Purchase {
         }
     }
 
-    mutating func run() async throws {
+    mutating func run() throws {
         // Authenticate with the App Store
         let keychainStore = KeychainStore(service: "ipatool.service")
 
@@ -121,11 +121,11 @@ extension Purchase {
         logger.log("Authenticated as '\(account.name)'.", level: .info)
 
         // Query for app
-        let app: iTunesResponse.Result = await app(with: bundleIdentifier)
+        let app: iTunesResponse.Result = app(with: bundleIdentifier)
         logger.log("Found app: \(app.name) (\(app.version)).", level: .debug)
 
         // Obtain a license
-        await purchase(app: app, account: account)
+        purchase(app: app, account: account)
         logger.log("Obtained a license for '\(app.identifier)'.", level: .debug)
         logger.log("Done.", level: .info)
     }

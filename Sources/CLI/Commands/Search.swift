@@ -13,7 +13,7 @@ import FoundationNetworking
 import Networking
 import StoreAPI
 
-struct Search: AsyncParsableCommand {
+struct Search: ParsableCommand {
     static var configuration: CommandConfiguration {
         return .init(abstract: "Search for iOS apps available on the App Store.")
     }
@@ -40,7 +40,7 @@ struct Search: AsyncParsableCommand {
 }
 
 extension Search {
-    mutating func results(with term: String) async -> [iTunesResponse.Result] {
+    mutating func results(with term: String) -> [iTunesResponse.Result] {
         logger.log("Creating HTTP client...", level: .debug)
         let httpClient = HTTPClient(session: URLSession.shared)
 
@@ -50,7 +50,7 @@ extension Search {
         logger.log("Searching for '\(term)' using the '\(countryCode)' store front...", level: .info)
 
         do {
-            let results = try await itunesClient.search(
+            let results = try itunesClient.search(
                 term: term,
                 limit: limit,
                 countryCode: countryCode,
@@ -70,9 +70,9 @@ extension Search {
         }
     }
     
-    mutating func run() async throws {
+    mutating func run() throws {
         // Search the iTunes store
-        let results = await results(with: term)
+        let results = results(with: term)
 
         // Compile output
         let output = results
